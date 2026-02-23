@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Alumno</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Navbar simple -->
+    <nav class="navbar navbar-dark bg-primary px-4 mb-4">
+        <span class="navbar-brand">🎓 Portal Académico</span>
+        <div class="d-flex">
+            <a href="/inscripcion" class="btn btn-warning me-2">Inscribir Materias</a>
+            <a href="/logout" class="btn btn-outline-light">Salir</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Alertas -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="row">
+            <!-- COLUMNA 1: DATOS ALUMNO -->
+            <div class="col-md-4">
+                <div class="custom-card">
+                    <div class="card-header-custom">👤 Datos del Alumno</div>
+                    <div class="card-body">
+                        <h5>{{ alumno.nombre }}</h5>
+                        <ul class="list-unstyled mt-3">
+                            <li><strong>Matrícula:</strong> {{ alumno.matricula }}</li>
+                            <li><strong>Carrera:</strong> {{ alumno.carrera }}</li>
+                            <li><strong>Semestre:</strong> {{ alumno.semestre_actual }}°</li>
+                            <li><strong>CURP:</strong> {{ alumno.curp }}</li>
+                            <li><strong>Email:</strong> {{ alumno.email }}</li>
+                            <li><strong>Teléfono:</strong> {{ alumno.telefono }}</li>
+                            <li><strong>Ingreso:</strong> {{ alumno.anio_ingreso }}</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- MATERIAS EN CURSO -->
+                <div class="custom-card">
+                    <div class="card-header-custom bg-success">📚 Carga Académica Actual</div>
+                    <div class="card-body">
+                        {% if cursando %}
+                            {% for m in cursando %}
+                                <div class="alert alert-primary mb-2">
+                                    <strong>{{ m.nombre }}</strong> <br>
+                                    <small>Intento #{{ m.numero_intento }}</small>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-muted text-center">No tienes carga inscrita.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- COLUMNA 2: MAPA CURRICULAR -->
+            <div class="col-md-8">
+                <div class="custom-card">
+                    <div class="card-header-custom">🗺️ Mapa Curricular</div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for m in mapa %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="materia-badge 
+                                        {% if m.estatus == 2 %} estado-aprobada
+                                        {% elif m.estatus == 3 %} estado-reprobada
+                                        {% elif m.estatus == 1 %} estado-cursando
+                                        {% else %} estado-pendiente {% endif %}">
+                                        <strong>{{ m.nombre }}</strong><br>
+                                        <small>{{ m.semestre }}° Semestre</small><br>
+                                        {% if m.estatus == 2 %} ✅ {{ m.calif }}
+                                        {% elif m.estatus == 3 %} ❌ Reprobada
+                                        {% elif m.estatus == 1 %} ⏳ Cursando
+                                        {% else %} ⚪ Pendiente {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
